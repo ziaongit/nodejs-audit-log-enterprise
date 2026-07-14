@@ -64,11 +64,16 @@ nodejs-audit-log-enterprise/
 │   └── utils/
 │       └── hashChain.js          # SHA-256 hash computation
 ├── scripts/
-│   ├── verifyChain.js            # Integrity verification
+│   ├── verifyChain.js            # Integrity verification + webhook alerting
 │   └── archiveLogs.js            # Monthly archive to Azure Blob
+├── tests/
+│   └── audit.test.js             # Jest tests: old_values, identity, chain, tamper detection
+├── docs/
+│   └── auditor-queries.sql       # Ready-to-run SQL for SOC 2 / GDPR auditor requests
 ├── app.js
 ├── server.js
-└── .env.example
+├── .env.example
+└── .env.test
 ```
 
 ---
@@ -117,6 +122,19 @@ curl http://localhost:3000/api/records/audit \
 ```bash
 npm run verify-chain
 # Chain intact. 12 records verified.
+```
+
+### 7. Run the test suite
+```bash
+npm test
+# PASS tests/audit.test.js
+#   Audit Log — old_values capture
+#     ✓ captures old_values BEFORE the update, not after (412 ms)
+#   Audit Log — identity integrity
+#     ✓ logs identity from JWT, ignoring any body fields (203 ms)
+#   Audit Log — hash chain integrity
+#     ✓ chain is intact after 10 sequential writes (1134 ms)
+#     ✓ detects a tampered record (89 ms)
 ```
 
 ---
